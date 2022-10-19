@@ -1,0 +1,33 @@
+---
+- name: install lamp stack
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: update ubuntu packages
+      apt:
+        update_cache: yes
+    - name: install java packages
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - openjdk-11-jre
+        - openjdk-11-jdk-headless
+        - libxt-dev
+        -  openjdk-11-jdk
+        - maven
+    - name: download jfrog artifact
+      ansible.builtin.command: wget --user=issuesaws@gmail.com --password=cmVmdGtuOjAxOjAwMDAwMDAwMDA6RkJ3cGZXTnQycUhtbGVsMjRrSTRFbTc3MjNP https://springprtclinicproject.jfrog.io/artifactory/adminadmin/org/springframework/samples/spring-petclinic/2.7.3/spring-petclinic-2.7.3.jar
+    - name: copy file
+      ansible.builtin.copy:
+        src: /home/ubuntu/springpetclinic.service
+        dest: /etc/systemd/system/springpetclinic.service
+    - name: jar file copy
+      ansible.builtin.copy:
+        src: spring-petclinic-2.7.3.jar
+        dest: /home/ubuntu/spring-petclinic-2.7.3.jar
+    - name: service started and reload
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: yes
+        name: springpetclinic
